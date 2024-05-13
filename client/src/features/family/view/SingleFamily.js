@@ -1,14 +1,45 @@
+import { useEffect } from "react"
+import { useNavigate, useParams } from "react-router-dom";
+import { useGetAllFamiliesQuery, useUpdateFamilyMutation } from "../familiesApiSlice"
+
 import "./singleFamily.css"
+
 const SingleFamily = () => {
-    const family = {}
+    
+    const navigate = useNavigate()
+    const { familyId } = useParams()
+    const { data: familiesObj, isError, error, isSuccess, isLoading } = useGetAllFamiliesQuery()
+    const [updateFamily, { isSuccess: isUpdateSuccess }] = useUpdateFamilyMutation()
+    useEffect(() => {
+        if (isUpdateSuccess) {
+            navigate("/dash/families")
+        }
+    }, [isUpdateSuccess])
+
+    if (isLoading)
+        return <h1>Loading...</h1>
+    if (isError)
+        return <h1>{JSON.stringify(error)}</h1>
+        
+    const family = familiesObj.data.find(fam => fam._id === familyId)
+    if (!family)
+        return <h1>no found</h1>
+    
+    const formSubmit = (e) => {
+        e.preventDefault()
+        const data = new FormData(e.target)
+        // const objFamily = Object.fromEntries(data.entries())
+        updateFamily(data)
+    }
+
     return (
         <div className="single-family-container">
-            {/* מציג את שם המדשפחה וההורים ככותרת ובפורם נותן אפשרות לעדכן */}
+            {/* מציג את שם המשפחה וההורים ככותרת ובפורם נותן אפשרות לעדכן */}
             <div className="single-family-info">
-                {`${family.name} ${family.husband.first_name} ${family.wife.first_name}`}
+                {`${family.familyName} ${family.husband} ${family.wife}`}
             </div>
             <div className="single-family-form-container">
-                <form className="single-family-form">
+                <form onSubmit={formSubmit} className="single-family-form">
                     <input type="text" required name="familyName" placeholder="שם משפחה" />
                     <input type="text" required name="username" placeholder="שם משתמש" />
                     <input type="password" required name="password" placeholder="סיסמה" />
@@ -47,13 +78,14 @@ const SingleFamily = () => {
                     <input type="text" required="true" name="bankNumber" placeholder="מספר בנק" />
                     <input type="text" required="true" name="branchNumber" placeholder="מספר סניף" />
                     <input type="text" required="true" name="accountNumber" placeholder="מספר חשבון" />
-
                     <h4>נציג</h4>
-                    {family.employee}
+                    {family.employee?.name}
                     <h4>מאושר</h4>
                     {family.approved}
                     <h4>ממתין לטיפול</h4>
                     {family.waiting}
+                    <label>צילום ת"ז</label>
+                    <input type="file" name="tzFile"/>
                     <button>עדכון</button>
                 </form>
             </div>

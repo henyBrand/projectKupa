@@ -5,15 +5,37 @@ const familiesApiSlice = apiSlice.injectEndpoints({
         getAllFamilies: build.query({
             query: () => ({
                 url: "/api/family"
-            })
+            }),
+
+            //////////////////////////////
+            providesTags: ["Families"]
         }),
-        addFamily:build.mutation({
-            query:(employee)=>({
-                url:"/api/family",
-                method:"POST",
-                body:employee
-            })
+        addFamily: build.mutation({
+            query: (family) => ({
+                url: "/api/family",
+                method: "POST",
+                body: family
+            }),
+            //////////////////////////////
+            invalidatesTags: ["Families"]
+        }),
+        updateFamily: build.mutation({
+            query: (family) => ({
+                url: "/api/family",
+                method: "PUT",
+                body: family
+            }),
+            invalidatesTags: ["Families"]
+        }),
+        deleteFamily: build.mutation({
+            query: ({ _id }) => ({
+                url: "/api/family",
+                method: "DELETE",
+                body: { _id }
+            }),
+            invalidatesTags: ["Families"]
         })
     })
+
 })
-export const { useGetAllFamiliesQuery,useAddFamilyMutation } = familiesApiSlice
+export const { useGetAllFamiliesQuery, useAddFamilyMutation, useUpdateFamilyMutation, useDeleteFamilyMutation } = familiesApiSlice

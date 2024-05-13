@@ -20,8 +20,7 @@ const employeeSchema = new mongoose.Schema({
     email: {
         type: String,
         lowercase: true,
-        //למה צריך
-        //trim: true
+        trim: true
     },
     role: {
         type: String,

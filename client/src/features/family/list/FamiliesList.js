@@ -1,14 +1,22 @@
-import { Link } from "react-router-dom"
+import { Link, useSearchParams } from "react-router-dom"
 import { useGetAllFamiliesQuery } from "../familiesApiSlice"
 import "./FamiliesList.css"
 import Search from "../../../components/search/Search"
+import useGetFilePath from "../../../hooks/useGetFilePath"
 
 const FamiliesList = () => {
     const { data: familiesObj, isError, error, isLoading } = useGetAllFamiliesQuery()
+    const [searchParams] = useSearchParams()
+    const q = searchParams.get("q")
+    const { getFilePath } = useGetFilePath()
     if (isLoading)
         return <h1>Loading...</h1>
     if (isError)
-        return <h1>{JSON.stringify(error)}helllo</h1>
+        return <h1>{JSON.stringify(error)}</h1>
+
+    //להוסיף תנאים לפילטור (שם הבעל,האשה וכו)
+    const filteredData = !q ? [...familiesObj.data] : familiesObj.data.filter(family => family.familyName.indexOf(q) > -1)
+
     return (
         <div className="families-list">
             <div className="families-list-top">
@@ -28,34 +36,35 @@ const FamiliesList = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {console.log(familiesObj.data)}
-                    {familiesObj.data?.map(family =>
+                    {filteredData?.map(family =>
                         <tr key={family._id}>
                             <td>
                                 <div className="families-list-family">
-                                    {family.familyName}
+                                    {family.name}
                                 </div>
                             </td>
                             <td>
-                                {family.husband}
+                                {family.parent1?.first_name}
                             </td>
                             <td>
-                                {family.wife}
+                                {family.parent2?.first_name}
                             </td>
                             <td>
-                                {/* {family.child} */}
+                                {/* {family.child.length} */}
                             </td>
                             <td>
-                                {family.employee}
+                                {family.employee?.name}
                             </td>
                             <td>
-                                {family.waiting?"✔":"❓"}
+                                {family.waiting ? "✔" : "❓"}
                             </td>
                             <td>
-                                {family.approved?"✔":"❓"}
+                                {family.approved ? "✔" : "❓"}
                             </td>
                             <td>
+                                <Link to={getFilePath(family.tzFile)}>לצילום ת"ז</Link>
                                 <Link to={`/dash/families/${family._id}`} className="families-list-button families-list-view">עדכון</Link>
+
                             </td>
                         </tr>)}
                 </tbody>

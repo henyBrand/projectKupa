@@ -5,15 +5,33 @@ const employeeApiSlice = apiSlice.injectEndpoints({
         getAllEmployees: build.query({
             query: () => ({
                 url: "/api/employee"
-            })
+            }),
+            providesTags: ["Employees"]
         }),
-        addEmployee:build.mutation({
-            query:(employee)=>({
-                url:"/api/employee",
-                method:"POST",
-                body:employee
-            })
+        addEmployee: build.mutation({
+            query: (employee) => ({
+                url: "/api/employee",
+                method: "POST",
+                body: employee
+            }),
+            invalidatesTags: ["Employees"]
+        }),
+        updateEmployee: build.mutation({
+            query: (employee) => ({
+                url: "/api/employee",
+                method: "PUT",
+                body: employee
+            }),
+            invalidatesTags: ["Employees"]
+        }),
+        deleteEmployee: build.mutation({
+            query: ({_id}) => ({
+                url: "/api/employee",
+                method: "DELETE",
+                body: {_id}
+            }),
+            invalidatesTags: ["Employees"]
         })
     })
 })
-export const { useGetAllEmployeesQuery,useAddEmployeeMutation } = employeeApiSlice
+export const { useGetAllEmployeesQuery, useAddEmployeeMutation,useUpdateEmployeeMutation,useDeleteEmployeeMutation } = employeeApiSlice

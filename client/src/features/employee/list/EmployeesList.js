@@ -1,13 +1,26 @@
-import { Link } from "react-router-dom"
-import { useGetAllEmployeesQuery } from "../employeesApiSlice"
+import { Link, useSearchParams } from "react-router-dom"
+import { useDeleteEmployeeMutation, useGetAllEmployeesQuery } from "../employeesApiSlice"
 import "./EmployeesList.css"
 import Search from "../../../components/search/Search"
+
 const EmployeesList = () => {
-    const { data: employeesObj, isError, error, isLoading } = useGetAllEmployeesQuery()
+    const { data: employeesObj, isError, error, isLoading, isSuccess } = useGetAllEmployeesQuery()
+    const [deleteEmployee, { isSuccess: isDeleteSuccess ,isError:isDeleteEror}] = useDeleteEmployeeMutation()
+    const deleteClick = (employee) => {
+        if (window.confirm("האם אתה בטוח שברצונך למחוק את העובד")) {
+            deleteEmployee({ _id: employee._id })
+        }
+    }
+
+    const [searchParams] = useSearchParams()
+    const q = searchParams.get("q")
+
     if (isLoading)
         return <h1>Loading...</h1>
     if (isError)
         return <h1>{JSON.stringify(error)}helllo</h1>
+
+    const filteredData = !q ? [...employeesObj.data] : employeesObj.data.filter(emp => emp.name.indexOf(q) > -1)
     return (
         <div className="employees-list">
             <div className="employees-list-top">
@@ -24,7 +37,7 @@ const EmployeesList = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {employeesObj.data?.map(employee =>
+                    {filteredData?.map(employee =>
                         <tr key={employee._id}>
                             <td>
                                 <div className="employees-list-employee">
@@ -42,7 +55,7 @@ const EmployeesList = () => {
                             </td>
                             <td>
                                 <Link to={`/dash/employees/${employee._id}`} className="employees-list-button employees-list-view">עדכון</Link>
-                                <button className="employees-list-button employees-list-delete">מחיקה</button>
+                                <button onClick={() => { deleteClick(employee) }} className="employees-list-button employees-list-delete">מחיקה</button>
                             </td>
                         </tr>)}
                 </tbody>

@@ -95,7 +95,7 @@ const updateEmployee = async (req, res) => {
     }
     if (username) {
         const duplicate = await Employee.findOne({ username }).lean()
-        if (duplicate) {
+        if (duplicate && duplicate.username !== employee.username) {
             return res.status(409).json({
                 error: true,
                 message: "duplicate username",

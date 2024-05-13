@@ -1,8 +1,18 @@
 import { MdDeselect, MdLogout, MdSearch } from "react-icons/md"
-import MenuLink from "./MenuLink"
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import "./sidebar.css"
+import MenuLink from "./MenuLink"
+// import { useSendLogoutMutation } from "../../features/auth/authApiSlice";
+import useAuth from "../../hooks/useAuth";
+
 const SideBar = () => {
-    const menuItems = [
+    const { username, fullname, role } = useAuth()
+    // const [logout, { isSuccess }] = useSendLogoutMutation()
+    const navigate = useNavigate()
+
+    const adminMenuItems = [
         {
             title: "דפים",
             list: [
@@ -44,15 +54,82 @@ const SideBar = () => {
 
 
         }]
-    const user = {
-        username: "username",
-        fullname: "fullname"
+    const employeeMenuItems = [
+        {
+            title: "דפים",
+            list: [
+                {
+                    title: "ראשי",
+                    path: "/dash",
+                    icon: <MdSearch />,
+                },
+                {
+                    title: "משפחות",
+                    path: "/dash/families",
+                    icon: <MdSearch />,
+                }
+            ]
+        },
+        {
+            title: "משתמשים",
+            list: [
+                {
+                    title: "הגדרות",
+                    path: "/dash/settings",
+                    icon: <MdSearch />,
+                },
+                {
+                    title: "עזרה",
+                    path: "/dash/help",
+                    icon: <MdSearch />,
+                },
+            ]
+
+
+        }]
+    const familyMenuItems = [
+        {
+            title: "דפים",
+            list: [
+                {
+                    title: "ראשי",
+                    path: "/dash",
+                    icon: <MdSearch />,
+                }
+            ]
+        },
+        {
+            title: "משתמשים",
+            list: [
+                {
+                    title: "הגדרות",
+                    path: "/dash/settings",
+                    icon: <MdSearch />,
+                },
+                {
+                    title: "עזרה",
+                    path: "/dash/help",
+                    icon: <MdSearch />,
+                },
+            ]
+
+
+        }]
+
+    const menuItems = role === "מנהל" ? adminMenuItems : (role === "נציג" ? employeeMenuItems : familyMenuItems)
+  
+
+    const logoutClick = () => {
+        //logout()
+        navigate("/login")
+
     }
     return <div className="side-bar">
         <div className="side-bar-user">
             <div className="side-bar-user-details">
-                <span className="side-bar-user-fullname">{user.fullname}</span>
-                <span className="side-bar-user-username">{user.username}</span>
+                <span className="side-bar-user-fullname">{fullname}</span>
+                <span className="side-bar-user-username">{username}</span>
+                <span className="side-bar-user-role">{role}</span>
             </div>
         </div>
         <ul className="side-bar-menu-list">{menuItems.map(cat => (<li key={cat.title}>
@@ -63,7 +140,7 @@ const SideBar = () => {
         </li>)
         )}
         </ul>
-        <button className="side-bar-logout">
+        <button onClick={logoutClick} className="side-bar-logout">
             <MdLogout />
             יציאה
         </button>
